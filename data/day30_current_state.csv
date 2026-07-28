@@ -1,0 +1,27 @@
+Category,Item,Current Owner,Current Status,Current Requirement,Active Blocker,Latest Event ID
+Project goal,ShieldPath Learning Lab,Team,Active,"Privacy-first, no-sign-in learning with courses, local progress, browser practice, and release quality gates.",,E085
+Current MVP feature,Browser smoke tests,Shaurya,Completed,"Local static server, synthetic data, no live backend.",,E020
+Current MVP feature,Local learner progress,Aarohi,Completed,"Store safe course, quiz, and challenge identifiers locally.",,E031
+Current MVP feature,Shared quiz engine,Dhruv,Completed,Accepted first rollout covers two representative quizzes.,,E032
+Current MVP feature,Terminal draft recovery,Aditya,Completed,Show recovered state and confirmed discard control with challenge-scoped storage.,,E050
+Current MVP feature,Cloud terminal deployment,Tavish,Completed,Azure VM is the primary target.,,E040
+Current MVP feature,Privacy-safe learning analytics,Dhruv,Completed,Allowlisted primitive identifiers only; no answers or free text.,,E055
+Current MVP feature,Guided learning paths,Aryan Raj,Completed,Mobile-first paths must preserve the full manual catalog.,,E076
+Current MVP feature,Static HTML QA gate,Aditya,Completed,Changed-file checks ignore HTML comments and use a small explicit allowlist.,,E078
+Completed task,Project README refresh,Aarohi,Completed,Concise walkthrough with diagrams and a short setup path.,,E067
+Open task,Legacy accessibility cleanup,Sidhaanth,Delayed,Courses 1-3 only; no broad allowlist.,Keyboard-only smoke coverage is incomplete.,E086
+Delayed task,MVP release,Team,Delayed,"Release target is July 17, 2026.",Keyboard-only smoke coverage is incomplete.,E085
+Canceled task,Live Help offline fallback,Sukriti,Canceled,Removed from this MVP; retain as future backlog context only.,,E045
+Canceled task,Standalone terminal demo mode,Rohan,Canceled,Existing mock mode covers the need.,,E035
+Removed feature,Guided paths desktop mockup,Ashwin,Canceled,Rejected for mobile usability; use the mobile-first layout.,,E059
+Active blocker,Keyboard-only smoke coverage,Shaurya,Blocked,Core catalog and terminal controls must work without a pointer.,Coverage is incomplete.,E086
+Resolved blocker,Browser dependency installation,Shaurya,Completed,Reuse the existing pinned Playwright stack.,,E017
+Resolved blocker,Root deployment routing,Ishaan,Completed,One safe resolver supports root and subpath hosting.,,E038
+Resolved blocker,Legacy analytics events,Dhruv,Completed,Compatibility hook covers legacy quizzes without answers.,,E055
+Current technical decision,Browser test framework,Shaurya,Active,Use Playwright.,,E014
+Current technical decision,Deployment platform,Tavish,Active,Use Azure as the primary deployment target.,,E034
+Current technical decision,Guided paths layout,Aryan Raj,Active,Use mobile-first paths and preserve manual course links.,,E061
+Replaced technical decision,Cypress test framework,Ishaan,Canceled,Replaced by Playwright.,,E014
+Replaced technical decision,OCI-first deployment,Tavish,Canceled,Replaced by Azure primary deployment.,,E034
+Replaced technical decision,Silent-only draft recovery,Aditya,Canceled,Replaced by visible recovered state and confirmed discard.,,E047
+Current release target,MVP release,Team,Delayed,"July 17, 2026.",Keyboard-only smoke coverage is incomplete.,E085
