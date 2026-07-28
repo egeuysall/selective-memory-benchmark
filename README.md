@@ -1,7 +1,10 @@
-# Selective Memory in AI Agents
+# RecallBench
 
-This repository contains the Week 4 and Week 5 experiments for **Selective
-Memory in AI Agents: A Benchmark for Long-Term Project Support**. It compares:
+**Evaluating AI Memory for Long-Term Project Support**
+
+RecallBench contains the Week 4 and Week 5 experiments for the research project
+originally proposed as *Selective Memory in AI Agents: A Benchmark for
+Long-Term Project Support*. It compares:
 
 1. a large-context baseline that receives all 86 project updates; and
 2. a simple RAG baseline that receives the five highest-scoring TF-IDF updates
@@ -21,6 +24,12 @@ benchmark.
 - `data/evaluation_questions.csv`: 15 questions and answer rubric
 
 No private project data, credentials, or contact details are included.
+
+## Submission
+
+- [Complete Week 4 and Week 5 deliverables](DELIVERABLES.md)
+- [Public Week 3 Google Sheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vShzbDGNay0SFVU8jsFeOO9Xr_NNcNiKUxvRHrRnYnJBZkybYBQs2o0X3mJe8akU0riTyxe6lF2_Exh/pubhtml)
+- [Recorded comparison results](results/summary.md)
 
 ## Run locally
 

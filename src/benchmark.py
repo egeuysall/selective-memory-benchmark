@@ -225,7 +225,7 @@ def write_summary(large_rows: list[dict[str, str]], rag_rows: list[dict[str, str
         })
     write_csv(RESULTS / "comparison.csv", comparison, list(comparison[0]))
     total = len(large_rows)
-    summary = f"""# Benchmark Results
+    summary = f"""# RecallBench Results
 
 The large-context baseline answered {large['Correct']}/{total} questions
 correctly. The TF-IDF RAG baseline answered {rag['Correct']}/{total} correctly

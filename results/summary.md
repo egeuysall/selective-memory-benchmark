@@ -1,4 +1,4 @@
-# Benchmark Results
+# RecallBench Results
 
 The large-context baseline answered 15/15 questions
 correctly. The TF-IDF RAG baseline answered 15/15 correctly
