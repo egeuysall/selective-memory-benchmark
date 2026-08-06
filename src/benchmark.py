@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the Week 4 large-context and Week 5 TF-IDF benchmarks."""
+"""Run the large-context, TF-IDF RAG, and selective-memory benchmarks."""
 
 from __future__ import annotations
 
@@ -10,13 +10,18 @@ import math
 import re
 import subprocess
 import tempfile
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 RESULTS = ROOT / "results"
 SCHEMA = ROOT / "schemas" / "answers.schema.json"
+MEMORY_OUTPUT = DATA / "selective_memory.csv"
+MEMORY_FIELDS = [
+    "Memory Item", "Category", "Current Status", "Original Information",
+    "Updated Information", "Use or Ignore", "Supporting Event IDs", "Notes",
+]
 STOPWORDS = {
     "a", "an", "and", "are", "as", "at", "be", "because", "by", "current",
     "currently", "day", "did", "do", "does", "end", "for", "from", "has",
@@ -45,6 +50,67 @@ def event_text(event: dict[str, str]) -> str:
         "Replaces Event", "Note",
     )
     return " | ".join(f"{field}: {event[field]}" for field in fields if event[field])
+
+
+def memory_event_text(event: dict[str, str]) -> str:
+    fields = ("Event ID", "Owner", "Status", "Blocker", "Requirement Change", "Note")
+    return "; ".join(f"{field}: {event[field]}" for field in fields if event[field])
+
+
+def build_selective_memory(
+    events: list[dict[str, str]], current_state: list[dict[str, str]]
+) -> list[dict[str, str]]:
+    events_by_task: defaultdict[str, list[dict[str, str]]] = defaultdict(list)
+    for event in events:
+        events_by_task[event["Task"]].append(event)
+
+    rows = []
+    ignored_categories = {"Canceled task", "Removed feature", "Replaced technical decision"}
+    for state in current_state:
+        history = events_by_task[state["Item"]]
+        original = memory_event_text(history[0]) if history else ""
+        updated = "; ".join(
+            f"{label}: {state[field]}"
+            for label, field in (
+                ("Owner", "Current Owner"),
+                ("Status", "Current Status"),
+                ("Requirement", "Current Requirement"),
+            )
+            if state[field]
+        )
+        use_or_ignore = "Ignore" if state["Category"] in ignored_categories else "Use"
+        notes = state["Active Blocker"] or (
+            "Historical or canceled information; do not use as current state."
+            if use_or_ignore == "Ignore" else ""
+        )
+        rows.append({
+            "Memory Item": state["Item"],
+            "Category": state["Category"],
+            "Current Status": state["Current Status"],
+            "Original Information": original,
+            "Updated Information": updated,
+            "Use or Ignore": use_or_ignore,
+            "Supporting Event IDs": "; ".join(event["Event ID"] for event in history),
+            "Notes": notes,
+        })
+
+    for event in events:
+        if event["Validity"] == "Current":
+            continue
+        if event["Validity"] not in {"Outdated", "Irrelevant", "Canceled"}:
+            continue
+        category = "Outdated fact" if event["Validity"] == "Outdated" else "Canceled or irrelevant fact"
+        rows.append({
+            "Memory Item": event["Task"],
+            "Category": category,
+            "Current Status": event["Status"],
+            "Original Information": memory_event_text(event),
+            "Updated Information": "Do not use as current state.",
+            "Use or Ignore": "Ignore",
+            "Supporting Event IDs": event["Event ID"],
+            "Notes": "Historical event marked outdated, canceled, or irrelevant.",
+        })
+    return rows
 
 
 def tokens(text: str) -> list[str]:
@@ -112,6 +178,23 @@ def rag_prompt(
     return f"{prompt_header()}\n\n" + "\n\n".join(sections)
 
 
+def selective_memory_prompt(
+    questions: list[dict[str, str]], memory: list[dict[str, str]]
+) -> str:
+    facts = "\n".join(
+        " | ".join(f"{field}: {row[field]}" for field in MEMORY_FIELDS if row[field])
+        for row in memory
+    )
+    asks = "\n".join(f"{row['Question ID']}: {row['Question']}" for row in questions)
+    instructions = (
+        "Use only memory rows marked Use for current answers. Rows marked Ignore "
+        "are historical context and must not be treated as current facts. Use the "
+        "updated information and source event IDs when a row contains both old "
+        "and new information."
+    )
+    return f"{prompt_header()}\n{instructions}\n\nSELECTIVE MEMORY:\n{facts}\n\nQUESTIONS:\n{asks}"
+
+
 def run_codex(prompt: str, raw_name: str) -> dict[str, str]:
     RESULTS.mkdir(exist_ok=True)
     with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as output:
@@ -137,14 +220,6 @@ def run_codex(prompt: str, raw_name: str) -> dict[str, str]:
 
 def classify(question: dict[str, str], answer: str) -> tuple[str, str]:
     normalized = answer.lower()
-    groups = [
-        [choice.strip().lower() for choice in group.split("|")]
-        for group in question["Required Keywords"].split(";")
-    ]
-    matched = [any(choice in normalized for choice in group) for group in groups]
-    if all(matched):
-        return "Correct", "Correct"
-
     outdated = [
         term.strip().lower()
         for group in question["Outdated Keywords"].split(";")
@@ -161,13 +236,34 @@ def classify(question: dict[str, str], answer: str) -> tuple[str, str]:
             "Outdated information": "Outdated information error",
         }.get(question["Category"], "Outdated information error")
         return "Incorrect", error
+
+    groups = [
+        [choice.strip().lower() for choice in group.split("|")]
+        for group in question["Required Keywords"].split(";")
+    ]
+    matched = [any(choice in normalized for choice in group) for group in groups]
+    if all(matched):
+        return "Correct", "Correct"
     return ("Incomplete", "Incomplete answer") if any(matched) else ("Incorrect", "Incorrect")
+
+
+def require_answer_ids(
+    questions: list[dict[str, str]], answers: dict[str, str]
+) -> None:
+    expected = {row["Question ID"] for row in questions}
+    actual = set(answers)
+    if actual != expected:
+        missing = ", ".join(sorted(expected - actual))
+        extra = ", ".join(sorted(actual - expected))
+        details = "; ".join(part for part in (f"missing: {missing}" if missing else "", f"extra: {extra}" if extra else "") if part)
+        raise RuntimeError(f"answer IDs do not match questions ({details})")
 
 
 def result_rows(
     questions: list[dict[str, str]],
     answers: dict[str, str],
     contexts: dict[str, list[tuple[float, dict[str, str]]]] | None = None,
+    condition: str = "large",
 ) -> list[dict[str, str]]:
     rows = []
     for question in questions:
@@ -180,11 +276,24 @@ def result_rows(
             "Correct Answer": question["Correct Answer"],
         }
         if contexts is not None:
+            supporting_ids = re.findall(r"E\d{3}", question["Supporting Current Event"])
+            retrieved_ids = {event["Event ID"] for _, event in contexts[question_id]}
             row["Retrieved Updates"] = "\n".join(
                 f"{event['Event ID']} ({score:.3f}): {event_text(event)}"
                 for score, event in contexts[question_id]
             )
             row["RAG Answer"] = answer
+            row["Supporting Current Event IDs"] = "; ".join(supporting_ids)
+            matched_supporting = retrieved_ids.intersection(supporting_ids)
+            row["Supporting Event Retrieved"] = "Yes" if matched_supporting else "No"
+            row["Supporting Event Coverage"] = (
+                "All" if len(matched_supporting) == len(set(supporting_ids))
+                else "Partial" if matched_supporting else "None"
+            )
+            row["RAG Answer Correct"] = "Yes" if status == "Correct" else "No"
+        elif condition == "selective":
+            row["Selective-Memory Answer"] = answer
+            row["Selective-Memory Answer Correct"] = "Yes" if status == "Correct" else "No"
         else:
             row["AI Answer"] = answer
         row["Correct/Incorrect"] = status
@@ -198,21 +307,28 @@ def result_rows(
     return rows
 
 
-def write_summary(large_rows: list[dict[str, str]], rag_rows: list[dict[str, str]]) -> None:
+def write_summary(
+    large_rows: list[dict[str, str]],
+    rag_rows: list[dict[str, str]],
+    selective_rows: list[dict[str, str]],
+) -> None:
     def counts(rows: list[dict[str, str]]) -> Counter:
         return Counter(row["Correct/Incorrect"] for row in rows)
 
     large, rag = counts(large_rows), counts(rag_rows)
     comparison = []
-    for large_row, rag_row in zip(large_rows, rag_rows):
+    for large_row, rag_row, selective_row in zip(large_rows, rag_rows, selective_rows):
         large_status = large_row["Correct/Incorrect"]
         rag_status = rag_row["Correct/Incorrect"]
-        winner = "Tie"
         rank = {"Incorrect": 0, "Incomplete": 1, "Correct": 2}
-        if rank[large_status] > rank[rag_status]:
-            winner = "Large context"
-        elif rank[rag_status] > rank[large_status]:
-            winner = "RAG"
+        statuses = {
+            "Large context": large_status,
+            "RAG": rag_status,
+            "Selective memory": selective_row["Correct/Incorrect"],
+        }
+        best = max(rank[status] for status in statuses.values())
+        winners = [name for name, status in statuses.items() if rank[status] == best]
+        winner = winners[0] if len(winners) == 1 else "Tie"
         comparison.append({
             "Question ID": large_row["Question ID"],
             "Question": large_row["Question"],
@@ -220,65 +336,85 @@ def write_summary(large_rows: list[dict[str, str]], rag_rows: list[dict[str, str
             "Large Context Error Type": large_row["Error Type"],
             "RAG Status": rag_status,
             "RAG Error Type": rag_row["Error Type"],
+            "Supporting Event Retrieved": rag_row["Supporting Event Retrieved"],
+            "Supporting Event Coverage": rag_row["Supporting Event Coverage"],
+            "RAG Answer Correct": rag_row["RAG Answer Correct"],
+            "Selective Memory Status": selective_row["Correct/Incorrect"],
+            "Selective Memory Error Type": selective_row["Error Type"],
             "Winner": winner,
-            "Notes": "Both systems used the same model instructions and answer rubric.",
+            "Notes": "All conditions used the same questions and answer rubric.",
         })
-    write_csv(RESULTS / "comparison.csv", comparison, list(comparison[0]))
+    write_csv(RESULTS / "week6_comparison.csv", comparison, list(comparison[0]))
     total = len(large_rows)
     summary = f"""# RecallBench Results
 
 The large-context baseline answered {large['Correct']}/{total} questions
 correctly. The TF-IDF RAG baseline answered {rag['Correct']}/{total} correctly
-with the top five retrieved updates per question.
+with the top five retrieved updates per question. Selective memory answered
+{counts(selective_rows)['Correct']}/{total} correctly from the generated memory
+table.
+
+The top-five retrieval contained at least one supporting event for {sum(row['Supporting Event Retrieved'] == 'Yes' for row in rag_rows)}/{total} questions and the full supporting event set for {sum(row['Supporting Event Coverage'] == 'All' for row in rag_rows)}/{total}. RAG answer correctness is scored separately from retrieval coverage.
 
 | Approach | Correct | Incomplete | Incorrect | Accuracy |
 |---|---:|---:|---:|---:|
 | Large context | {large['Correct']} | {large['Incomplete']} | {large['Incorrect']} | {large['Correct'] / total:.1%} |
 | TF-IDF RAG | {rag['Correct']} | {rag['Incomplete']} | {rag['Incorrect']} | {rag['Correct'] / total:.1%} |
+| Selective memory | {counts(selective_rows)['Correct']} | {counts(selective_rows)['Incomplete']} | {counts(selective_rows)['Incorrect']} | {counts(selective_rows)['Correct'] / total:.1%} |
 
 The comparison tests whether smaller retrieved contexts reduce conflict or
 instead omit the newer event needed to replace an older fact. Automated labels
 use a transparent keyword rubric and should be reviewed alongside the saved
 answers before drawing conclusions.
 """
-    (RESULTS / "summary.md").write_text(summary, encoding="utf-8")
+    (RESULTS / "week6_summary.md").write_text(summary, encoding="utf-8")
 
 
 def validate() -> None:
     events = read_csv(DATA / "project_updates.csv")
     questions = read_csv(DATA / "evaluation_questions.csv")
-    assert len(events) == 86, f"expected 86 events, found {len(events)}"
+    current_state = read_csv(DATA / "day30_current_state.csv")
+    assert len(events) == 90, f"expected 90 events, found {len(events)}"
     assert [event["Event ID"] for event in events] == [
-        f"E{number:03d}" for number in range(1, 87)
+        f"E{number:03d}" for number in range(1, 91)
     ]
-    assert len(questions) == 15, f"expected 15 questions, found {len(questions)}"
+    assert len(questions) == 30, f"expected 30 questions, found {len(questions)}"
     assert len({row["Question ID"] for row in questions}) == len(questions)
+    event_ids = {event["Event ID"] for event in events}
     for row in questions:
         assert row["Required Keywords"], f"{row['Question ID']} has no rubric"
-        for event_id in re.findall(r"E\d{3}", row["Supporting Current Event"]):
-            assert any(event["Event ID"] == event_id for event in events), event_id
+        for field in ("Supporting Current Event", "Conflicting Old Event"):
+            for event_id in re.findall(r"E\d{3}", row[field]):
+                assert event_id in event_ids, event_id
+    assert sum(event["Update Type"] == "Deadline Change" for event in events) >= 4
+    assert any(event["Update Type"] == "Feature Revival" for event in events)
+    assert any(event["Task"] == "Browser smoke test fixtures" for event in events)
+    memory = build_selective_memory(events, current_state)
+    assert memory and all(set(MEMORY_FIELDS) == set(row) for row in memory)
     sample = retrieve("Who owns browser smoke tests?", events, 5)
     assert len(sample) == 5 and sample[0][0] > 0
-    print("Validated 86 events, 15 questions, event references, and TF-IDF retrieval.")
+    print("Validated 90 events, 30 questions, memory rows, event references, and TF-IDF retrieval.")
 
 
 def run(mode: str, engine: str, top_k: int) -> None:
     events = read_csv(DATA / "project_updates.csv")
     questions = read_csv(DATA / "evaluation_questions.csv")
+    current_state = read_csv(DATA / "day30_current_state.csv")
     contexts = {
         row["Question ID"]: retrieve(row["Question"], events, top_k)
         for row in questions
     }
-    large_rows = rag_rows = None
+    large_rows = rag_rows = selective_rows = None
     if mode in {"large", "all"}:
         answers = (
             {row["Question ID"]: row["Correct Answer"] for row in questions}
             if engine == "oracle"
-            else run_codex(large_context_prompt(events, questions), "week4_raw.json")
+            else run_codex(large_context_prompt(events, questions), "week6_large_raw.json")
         )
-        large_rows = result_rows(questions, answers)
+        require_answer_ids(questions, answers)
+        large_rows = result_rows(questions, answers, condition="large")
         write_csv(
-            RESULTS / "week4_large_context_results.csv",
+            RESULTS / "week6_large_context_results.csv",
             large_rows,
             ["Question ID", "Question", "Correct Answer", "AI Answer",
              "Correct/Incorrect", "Error Type", "Notes"],
@@ -287,17 +423,36 @@ def run(mode: str, engine: str, top_k: int) -> None:
         answers = (
             {row["Question ID"]: row["Correct Answer"] for row in questions}
             if engine == "oracle"
-            else run_codex(rag_prompt(questions, contexts), "week5_raw.json")
+            else run_codex(rag_prompt(questions, contexts), "week6_rag_raw.json")
         )
-        rag_rows = result_rows(questions, answers, contexts)
+        require_answer_ids(questions, answers)
+        rag_rows = result_rows(questions, answers, contexts, condition="rag")
         write_csv(
-            RESULTS / "week5_rag_results.csv",
+            RESULTS / "week6_rag_results.csv",
             rag_rows,
             ["Question ID", "Question", "Correct Answer", "Retrieved Updates",
-             "RAG Answer", "Correct/Incorrect", "Error Type", "Notes"],
+             "RAG Answer", "Supporting Current Event IDs", "Supporting Event Retrieved",
+             "Supporting Event Coverage", "RAG Answer Correct", "Correct/Incorrect",
+             "Error Type", "Notes"],
         )
-    if large_rows is not None and rag_rows is not None:
-        write_summary(large_rows, rag_rows)
+    if mode in {"selective", "all"}:
+        memory = build_selective_memory(events, current_state)
+        write_csv(MEMORY_OUTPUT, memory, MEMORY_FIELDS)
+        answers = (
+            {row["Question ID"]: row["Correct Answer"] for row in questions}
+            if engine == "oracle"
+            else run_codex(selective_memory_prompt(questions, memory), "week6_selective_raw.json")
+        )
+        require_answer_ids(questions, answers)
+        selective_rows = result_rows(questions, answers, condition="selective")
+        write_csv(
+            RESULTS / "week6_selective_memory_results.csv",
+            selective_rows,
+            ["Question ID", "Question", "Correct Answer", "Selective-Memory Answer",
+             "Selective-Memory Answer Correct", "Correct/Incorrect", "Error Type", "Notes"],
+        )
+    if large_rows is not None and rag_rows is not None and selective_rows is not None:
+        write_summary(large_rows, rag_rows, selective_rows)
 
 
 def main() -> None:
@@ -305,7 +460,7 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("validate")
     run_parser = subparsers.add_parser("run")
-    run_parser.add_argument("--mode", choices=("large", "rag", "all"), default="all")
+    run_parser.add_argument("--mode", choices=("large", "rag", "selective", "all"), default="all")
     run_parser.add_argument("--engine", choices=("codex", "oracle"), default="codex")
     run_parser.add_argument("--top-k", type=int, choices=range(3, 6), default=5)
     args = parser.parse_args()

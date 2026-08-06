@@ -9,10 +9,12 @@ Current MVP feature,Privacy-safe learning analytics,Dhruv,Completed,Allowlisted 
 Current MVP feature,Guided learning paths,Aryan Raj,Completed,Mobile-first paths must preserve the full manual catalog.,,E076
 Current MVP feature,Static HTML QA gate,Aditya,Completed,Changed-file checks ignore HTML comments and use a small explicit allowlist.,,E078
 Completed task,Project README refresh,Aarohi,Completed,Concise walkthrough with diagrams and a short setup path.,,E067
-Open task,Legacy accessibility cleanup,Sidhaanth,Delayed,Courses 1-3 only; no broad allowlist.,Keyboard-only smoke coverage is incomplete.,E086
+Open task,Legacy accessibility cleanup,Sidhaanth,Delayed,"Courses 1-3 only; no broad allowlist; bounded target July 19, 2026.",Keyboard-only smoke coverage is incomplete.,E090
 Delayed task,MVP release,Team,Delayed,"Release target is July 17, 2026.",Keyboard-only smoke coverage is incomplete.,E085
 Canceled task,Live Help offline fallback,Sukriti,Canceled,Removed from this MVP; retain as future backlog context only.,,E045
+Future backlog feature,Help Center prompt fallback,Sukriti,Future Backlog,Limited fallback retained for a future release; not current MVP.,,E087
 Canceled task,Standalone terminal demo mode,Rohan,Canceled,Existing mock mode covers the need.,,E035
+Related active task,Browser smoke test fixtures,Naysa,Active,Fixture-only browser coverage; separate from end-to-end browser smoke tests.,,E088
 Removed feature,Guided paths desktop mockup,Ashwin,Canceled,Rejected for mobile usability; use the mobile-first layout.,,E059
 Active blocker,Keyboard-only smoke coverage,Shaurya,Blocked,Core catalog and terminal controls must work without a pointer.,Coverage is incomplete.,E086
 Resolved blocker,Browser dependency installation,Shaurya,Completed,Reuse the existing pinned Playwright stack.,,E017

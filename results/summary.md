@@ -4,6 +4,11 @@ The large-context baseline answered 15/15 questions
 correctly. The TF-IDF RAG baseline answered 15/15 correctly
 with the top five retrieved updates per question.
 
+The current supporting event appeared in the top-five retrieval for
+15/15
+questions. RAG answer correctness is scored separately from that retrieval
+coverage.
+
 | Approach | Correct | Incomplete | Incorrect | Accuracy |
 |---|---:|---:|---:|---:|
 | Large context | 15 | 0 | 0 | 100.0% |
