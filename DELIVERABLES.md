@@ -246,9 +246,31 @@ selective-memory condition and the harder revised benchmark below.
 | TF-IDF RAG | Top 5 events per question | 21 | 8 | 1 | 70.0% |
 | Selective memory | 94-row use/ignore memory table | 25 | 3 | 2 | 83.3% |
 
-Selective memory scored highest in this run, but this does not establish
-general superiority. Week 7 should manually review the saved answers and use
-the per-question error types before interpreting the result.
+Selective memory scored highest under the automated rubric, but this does not
+establish general superiority. The Week 7 audit below is the publication-facing
+interpretation of the saved replay.
+
+## Week 7 scoring and visual benchmark
+
+The earlier 24/22/26 replay is historical. The saved replay's automated labels
+are 23/21/25; after manual review of every non-Correct automated row, the
+canonical audited scores are:
+
+| Approach | Automated | Audited correct | Audited accuracy |
+|---|---:|---:|---:|
+| Large context | 23/30 | 27/30 | 90.0% |
+| Traditional TF-IDF RAG | 21/30 | 24/30 | 80.0% |
+| Selective memory | 25/30 | 29/30 | 96.7% |
+
+The complete scoring table is [`results/week7_final_scoring.csv`](results/week7_final_scoring.csv),
+and the adjudicated non-Correct rows are in [`results/week7_manual_review.csv`](results/week7_manual_review.csv).
+Selective memory was the only highest-scoring approach on Q16, Q17, and Q25;
+Q23 is its remaining event-provenance failure. The separate visual report is
+[`visual_benchmark/index.html`](visual_benchmark/index.html). It shows audited
+and automated accuracy, outcome/error mix, RAG coverage, token-cost proxy, and
+observed wall time without a composite score. The paper-writing roadmap is
+[`PUBLICATION_READINESS_AND_PAPER_GUIDE.md`](PUBLICATION_READINESS_AND_PAPER_GUIDE.md);
+Week 8 writing has not started.
 
 ## Limitations
 
@@ -307,3 +329,7 @@ tables are saved under `results/week6_*` and `data/`.
 - [x] Reproduction instructions included
 - [x] Public Week 3 dataset and public source repository linked
 - [x] No sensitive information included
+- [x] Week 7 manual review table and reconciled final score prepared
+- [x] Accuracy, error, RAG coverage, cost-proxy, and time figures prepared
+- [x] Publication-readiness and paper-writing roadmap prepared
+- [x] Week 8 manuscript writing intentionally left untouched

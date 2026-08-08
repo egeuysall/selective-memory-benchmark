@@ -366,6 +366,10 @@ The comparison tests whether smaller retrieved contexts reduce conflict or
 instead omit the newer event needed to replace an older fact. Automated labels
 use a transparent keyword rubric and should be reviewed alongside the saved
 answers before drawing conclusions.
+
+The publication-facing Week 7 manual audit of this replay is recorded in
+`results/week7_final_scoring.csv` and summarized in `results/week7_summary.md`.
+It preserves these automated labels while adjudicating every non-Correct row.
 """
     (RESULTS / "week6_summary.md").write_text(summary, encoding="utf-8")
 

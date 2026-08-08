@@ -18,3 +18,9 @@ The comparison tests whether smaller retrieved contexts reduce conflict or
 instead omit the newer event needed to replace an older fact. Automated labels
 use a transparent keyword rubric and should be reviewed alongside the saved
 answers before drawing conclusions.
+
+The publication-facing Week 7 audit of this saved replay is in
+[`week7_final_scoring.csv`](week7_final_scoring.csv) and
+[`week7_summary.md`](week7_summary.md). It reports audited scores of 27/30
+for large context, 24/30 for traditional TF-IDF RAG, and 29/30 for selective
+memory while preserving the automated labels above for auditability.

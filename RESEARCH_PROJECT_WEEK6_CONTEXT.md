@@ -1,6 +1,6 @@
 # Research Project - Ege: Week 6 Context
 
-Updated: 2026-08-06
+Updated: 2026-08-08
 
 ## Week 6 task
 
@@ -59,6 +59,35 @@ RAG retrieved at least one current supporting event for 28/30 questions and
 the complete supporting-event set for 23/30. An earlier live replay scored
 24/30, 22/30, and 26/30; the current files reflect the newer timed replay.
 
+## Week 7 reconciliation and analysis
+
+The earlier 24/22/26 replay is historical only. The later 23/21/25 values are
+the automated keyword labels for the saved replay. After manually reviewing
+every non-Correct automated answer, the canonical publication-facing score is:
+
+| Approach | Automated | Audited correct | Audited accuracy |
+| --- | ---: | ---: | ---: |
+| Large context | 23/30 | 27/30 | 90.0% |
+| Traditional TF-IDF RAG | 21/30 | 24/30 | 80.0% |
+| Selective memory | 25/30 | 29/30 | 96.7% |
+
+The audited table is [`results/week7_final_scoring.csv`](results/week7_final_scoring.csv)
+and the row-level review is [`results/week7_manual_review.csv`](results/week7_manual_review.csv).
+Selective memory was the only highest-scoring approach on Q16, Q17, and Q25.
+Its remaining miss was Q23: it cited nearby keyboard-coverage events instead
+of the exact requested event pair E081 and E086. The complete analysis is in
+[`results/week7_summary.md`](results/week7_summary.md).
+
+The visual benchmark is [`visual_benchmark/index.html`](visual_benchmark/index.html).
+It keeps accuracy, estimated token-cost proxy, and observed wall time as
+separate metrics. Selective memory used 18.1% fewer estimated total tokens than
+RAG but was 99.7% slower in this one replay; RAG was fastest. Exact USD is not
+asserted because the replay did not expose billable pricing.
+
+Week 8 manuscript writing has intentionally not started. The paper evidence
+map, publication-readiness checklist, and a step-by-step writing sequence are
+in [`PUBLICATION_READINESS_AND_PAPER_GUIDE.md`](PUBLICATION_READINESS_AND_PAPER_GUIDE.md).
+
 ## Validation
 
 ```text
@@ -84,3 +113,8 @@ in all three conditions. That is a pipeline check, not the live model result.
 - [`results/week6_efficiency.md`](results/week6_efficiency.md)
 - [`DELIVERABLES.md`](DELIVERABLES.md)
 - [`WEEK6_ASANA_SUBMISSION.md`](WEEK6_ASANA_SUBMISSION.md)
+- [`results/week7_final_scoring.csv`](results/week7_final_scoring.csv)
+- [`results/week7_manual_review.csv`](results/week7_manual_review.csv)
+- [`results/week7_summary.md`](results/week7_summary.md)
+- [`WEEK7_ASANA_SUBMISSION.md`](WEEK7_ASANA_SUBMISSION.md)
+- [`PUBLICATION_READINESS_AND_PAPER_GUIDE.md`](PUBLICATION_READINESS_AND_PAPER_GUIDE.md)

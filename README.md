@@ -37,6 +37,10 @@ No private project data, credentials, or contact details are included.
 - [Recorded Week 6 comparison results](results/week6_summary.md)
 - [Week 6 Asana submission packet](WEEK6_ASANA_SUBMISSION.md)
 - [Week 6 efficiency comparison](results/week6_efficiency.md)
+- [Week 7 audited scoring and analysis](results/week7_summary.md)
+- [Week 7 final scoring CSV](results/week7_final_scoring.csv)
+- [Vercel-style visual benchmark](visual_benchmark/index.html)
+- [Publication readiness and paper-writing guide](PUBLICATION_READINESS_AND_PAPER_GUIDE.md)
 
 ## Run locally
 
@@ -70,18 +74,24 @@ The automated rubric labels each answer as Correct, Incomplete, or Incorrect
 and identifies common errors such as outdated information, wrong ownership,
 missed blockers, and missed requirement changes. The labels are transparent
 heuristics, so the saved answers should also be reviewed before reporting the
-experiment.
+experiment. `src/week7_audit.py` records the manual adjudication of the saved
+replay without changing the original model answers.
 
 ## Observed result
 
 The original Week 4–5 run answered 15/15 questions correctly for both
-conditions. The latest timed Week 6 replay scored 23/30 (76.7%) for large
-context, 21/30 (70.0%) for RAG, and 25/30 (83.3%) for selective memory under
-the transparent keyword rubric. RAG included at least one current supporting
-event for 28/30 questions and the full supporting set for 23/30. Selective
-memory used 19.0% fewer estimated input tokens than RAG, but the one timed
-replay was slower end-to-end (217.326 seconds versus 108.809 seconds). These
-are dataset-specific, stochastic results and require manual review.
+conditions. The current timed Week 6 replay's automated keyword labels are
+23/30 (76.7%) for large context, 21/30 (70.0%) for RAG, and 25/30 (83.3%) for
+selective memory. After manually reviewing every non-Correct automated row,
+the publication-facing score is 27/30 (90.0%), 24/30 (80.0%), and 29/30
+(96.7%), respectively. The audited table is the canonical Week 7 score; the
+original CSV files preserve the automated labels for auditability. RAG included
+at least one current supporting event for 28/30 questions and the full
+supporting set for 23/30. Selective memory used 18.1% fewer estimated total
+tokens than RAG, but the one timed replay was slower end-to-end (217.326
+seconds versus 108.809 seconds). These are dataset-specific, stochastic
+results—not a claim of general superiority—and exact billable USD was not
+exposed.
 
 ## Outputs
 
@@ -96,6 +106,22 @@ are dataset-specific, stochastic results and require manual review.
 - `results/week6_comparison.csv` and `results/week6_summary.md`
 - `results/week6_efficiency.md`
 - `results/week6_large_raw.json`, `results/week6_rag_raw.json`, and `results/week6_selective_raw.json`
+- `results/week7_final_scoring.csv` and `results/week7_manual_review.csv`
+- `results/week7_summary.md`
+- `visual_benchmark/index.html` and `visual_benchmark/benchmark_snapshot.json`
+- `PUBLICATION_READINESS_AND_PAPER_GUIDE.md`
+
+The standalone visual report is rebuilt with:
+
+```bash
+python3 src/week7_audit.py
+python3 visual_benchmark/build_report.py
+python3 visual_benchmark/build_report.py --check
+```
+
+It uses inline SVG and semantic HTML, follows the supplied
+[Vercel design guidance](https://vercel.com/design.md), and does not add a
+charting dependency or a composite score.
 
 ## Student explanation
 
