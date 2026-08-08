@@ -9,8 +9,11 @@ import json
 import math
 import re
 import subprocess
+import sys
 import tempfile
+import time
 from collections import Counter, defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +21,7 @@ DATA = ROOT / "data"
 RESULTS = ROOT / "results"
 SCHEMA = ROOT / "schemas" / "answers.schema.json"
 MEMORY_OUTPUT = DATA / "selective_memory.csv"
+RUN_METRICS = RESULTS / "benchmark_run_metrics.json"
 MEMORY_FIELDS = [
     "Memory Item", "Category", "Current Status", "Original Information",
     "Updated Information", "Use or Ignore", "Supporting Event IDs", "Notes",
@@ -400,6 +404,37 @@ def validate() -> None:
     print("Validated 90 events, 30 questions, memory rows, event references, and TF-IDF retrieval.")
 
 
+def write_run_metrics(engine: str, top_k: int, mode: str, timings: dict[str, float]) -> None:
+    existing = {}
+    if RUN_METRICS.exists():
+        existing = json.loads(RUN_METRICS.read_text(encoding="utf-8"))
+    recorded_at = datetime.now(timezone.utc).isoformat()
+    conditions = existing.get("conditions", {})
+    for key, seconds in timings.items():
+        conditions[key] = {
+            "wall_seconds": round(seconds, 3),
+            "engine": engine,
+            "top_k": top_k,
+            "recorded_at": recorded_at,
+            "source": "benchmark runner",
+        }
+    RUN_METRICS.write_text(json.dumps({
+        "recorded_at": recorded_at,
+        "engine": engine,
+        "mode": mode,
+        "top_k": top_k,
+        "conditions": conditions,
+    }, indent=2) + "\n", encoding="utf-8")
+
+
+def generate_visual_benchmark() -> None:
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from visual_benchmark import build_report
+
+    build_report.write_artifacts()
+
+
 def run(mode: str, engine: str, top_k: int) -> None:
     events = read_csv(DATA / "project_updates.csv")
     questions = read_csv(DATA / "evaluation_questions.csv")
@@ -409,7 +444,9 @@ def run(mode: str, engine: str, top_k: int) -> None:
         for row in questions
     }
     large_rows = rag_rows = selective_rows = None
+    timings: dict[str, float] = {}
     if mode in {"large", "all"}:
+        started = time.perf_counter()
         answers = (
             {row["Question ID"]: row["Correct Answer"] for row in questions}
             if engine == "oracle"
@@ -423,7 +460,9 @@ def run(mode: str, engine: str, top_k: int) -> None:
             ["Question ID", "Question", "Correct Answer", "AI Answer",
              "Correct/Incorrect", "Error Type", "Notes"],
         )
+        timings["large"] = time.perf_counter() - started
     if mode in {"rag", "all"}:
+        started = time.perf_counter()
         answers = (
             {row["Question ID"]: row["Correct Answer"] for row in questions}
             if engine == "oracle"
@@ -439,7 +478,9 @@ def run(mode: str, engine: str, top_k: int) -> None:
              "Supporting Event Coverage", "RAG Answer Correct", "Correct/Incorrect",
              "Error Type", "Notes"],
         )
+        timings["rag"] = time.perf_counter() - started
     if mode in {"selective", "all"}:
+        started = time.perf_counter()
         memory = build_selective_memory(events, current_state)
         write_csv(MEMORY_OUTPUT, memory, MEMORY_FIELDS)
         answers = (
@@ -455,8 +496,12 @@ def run(mode: str, engine: str, top_k: int) -> None:
             ["Question ID", "Question", "Correct Answer", "Selective-Memory Answer",
              "Selective-Memory Answer Correct", "Correct/Incorrect", "Error Type", "Notes"],
         )
+        timings["selective"] = time.perf_counter() - started
     if large_rows is not None and rag_rows is not None and selective_rows is not None:
         write_summary(large_rows, rag_rows, selective_rows)
+    if timings:
+        write_run_metrics(engine, top_k, mode, timings)
+        generate_visual_benchmark()
 
 
 def main() -> None:

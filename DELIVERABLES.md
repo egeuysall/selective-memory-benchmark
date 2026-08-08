@@ -266,9 +266,10 @@ The complete scoring table is [`results/week7_final_scoring.csv`](results/week7_
 and the adjudicated non-Correct rows are in [`results/week7_manual_review.csv`](results/week7_manual_review.csv).
 Selective memory was the only highest-scoring approach on Q16, Q17, and Q25;
 Q23 is its remaining event-provenance failure. The separate visual report is
-[`visual_benchmark/index.html`](visual_benchmark/index.html). It shows audited
-and automated accuracy, outcome/error mix, RAG coverage, token-cost proxy, and
-observed wall time without a composite score. The paper-writing roadmap is
+[`visual_benchmark/benchmark.svg`](visual_benchmark/benchmark.svg). It shows
+automated accuracy against the token-cost proxy with observed time labels and
+no composite score. The audited publication score remains in the Week 7 table.
+The paper-writing roadmap is
 [`PUBLICATION_READINESS_AND_PAPER_GUIDE.md`](PUBLICATION_READINESS_AND_PAPER_GUIDE.md);
 Week 8 writing has not started.
 

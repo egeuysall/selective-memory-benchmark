@@ -1,0 +1,29 @@
+{
+  "recorded_at": "2026-08-06T00:00:00+00:00",
+  "engine": "codex",
+  "mode": "all",
+  "top_k": 5,
+  "conditions": {
+    "large": {
+      "wall_seconds": 150.057,
+      "engine": "codex",
+      "top_k": 5,
+      "recorded_at": "2026-08-06T00:00:00+00:00",
+      "source": "saved Week 6 live replay"
+    },
+    "rag": {
+      "wall_seconds": 108.809,
+      "engine": "codex",
+      "top_k": 5,
+      "recorded_at": "2026-08-06T00:00:00+00:00",
+      "source": "saved Week 6 live replay"
+    },
+    "selective": {
+      "wall_seconds": 217.326,
+      "engine": "codex",
+      "top_k": 5,
+      "recorded_at": "2026-08-06T00:00:00+00:00",
+      "source": "saved Week 6 live replay"
+    }
+  }
+}

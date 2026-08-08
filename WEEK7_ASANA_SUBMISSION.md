@@ -25,9 +25,9 @@ changes), Q17 (resolved blocker followed by a later blocker), and Q25 (canceled
 features). Its remaining miss was Q23: the answer cited nearby keyboard-
 coverage events instead of the exact requested event pair E081 and E086.
 
-The summary figures are in visual_benchmark/index.html. They include audited
-and automated accuracy, outcome mix, audited error categories, and RAG
-retrieval coverage. RAG retrieved at least one current supporting event for
+The summary figure is in visual_benchmark/benchmark.svg. It shows automated
+accuracy against estimated token cost, with observed time in each point label.
+RAG retrieved at least one current supporting event for
 28/30 questions, all supporting events for 23/30, a partial set for 5/30, and
 none for 2/30.
 
@@ -55,12 +55,12 @@ PUBLICATION_READINESS_AND_PAPER_GUIDE.md.
 
 ## Submission files
 
-- `results/week7_final_scoring.csv` — all 90 approach/question scoring rows.
-- `results/week7_manual_review.csv` — the 21 saved non-Correct automated rows
+- `results/week7_final_scoring.csv`: all 90 approach/question scoring rows.
+- `results/week7_manual_review.csv`: the 21 saved non-Correct automated rows
   with manual labels and reasons.
-- `results/week7_summary.md` — reconciled final results, error categories,
+- `results/week7_summary.md`: reconciled final results, error categories,
   selective-memory wins, and the Q23 failure.
-- `visual_benchmark/index.html` — accuracy, outcome, error, retrieval, cost,
-  time, and question-level figures.
-- `PUBLICATION_READINESS_AND_PAPER_GUIDE.md` — paper evidence map and writing
+- `visual_benchmark/benchmark.svg`: accuracy against estimated cost with direct
+  time labels and metric-specific interpretation.
+- `PUBLICATION_READINESS_AND_PAPER_GUIDE.md`: paper evidence map and writing
   sequence; Week 8 remains unstarted.

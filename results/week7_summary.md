@@ -46,7 +46,7 @@ These are the examples to inspect in the Results and Discussion sections.
 
 | Question | Audited label | Cause |
 |---|---|---|
-| `Q23` | Incorrect | Event provenance — The question asks for E081 and E086, but the answer cites E084, E085, E089, and E090 instead. |
+| `Q23` | Incorrect | Event provenance: The question asks for E081 and E086, but the answer cites E084, E085, E089, and E090 instead. |
 
 The selective-memory miss is an event-provenance error: the answer
 described nearby keyboard-coverage changes but did not cite the two
@@ -78,7 +78,7 @@ python3 src/week7_audit.py
 python3 visual_benchmark/build_report.py --check
 ```
 
-The visual benchmark is [the Vercel-style report](../visual_benchmark/index.html).
+The visual benchmark is [the Vercel-style SVG](../visual_benchmark/benchmark.svg).
 Its price comparison is an estimated token-cost proxy because the Codex
 replay did not expose billable USD or a model price schedule.
 

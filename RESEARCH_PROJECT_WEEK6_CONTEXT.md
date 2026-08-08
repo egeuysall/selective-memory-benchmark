@@ -17,9 +17,9 @@ selective memory.
 
 | Required deliverable | Repository artifact | Ready |
 | --- | --- | --- |
-| Revised evaluation question set | `data/evaluation_questions.csv` — 30 questions with answer keys, required/forbidden keywords, and supporting/conflicting event IDs | Yes |
+| Revised evaluation question set | `data/evaluation_questions.csv`: 30 questions with answer keys, required/forbidden keywords, and supporting/conflicting event IDs | Yes |
 | Updated scoring table | `results/week6_comparison.csv` plus the three condition result CSVs | Yes |
-| Selective-memory table | `data/selective_memory.csv` — current, updated, outdated, canceled, use/ignore, and source-event fields | Yes |
+| Selective-memory table | `data/selective_memory.csv`: current, updated, outdated, canceled, use/ignore, and source-event fields | Yes |
 | Benchmark ready for all three approaches | `src/benchmark.py` and saved Week 6 raw/result files | Yes |
 
 ## What changed for Week 6
@@ -78,7 +78,7 @@ Its remaining miss was Q23: it cited nearby keyboard-coverage events instead
 of the exact requested event pair E081 and E086. The complete analysis is in
 [`results/week7_summary.md`](results/week7_summary.md).
 
-The visual benchmark is [`visual_benchmark/index.html`](visual_benchmark/index.html).
+The visual benchmark is [`visual_benchmark/benchmark.svg`](visual_benchmark/benchmark.svg).
 It keeps accuracy, estimated token-cost proxy, and observed wall time as
 separate metrics. Selective memory used 18.1% fewer estimated total tokens than
 RAG but was 99.7% slower in this one replay; RAG was fastest. Exact USD is not

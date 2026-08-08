@@ -1,400 +1,74 @@
 {
-  "title": "Selective memory benchmark",
+  "title": "Accuracy against estimated token cost",
+  "source": "Automated labels from the current Week 6 result CSVs",
   "run": {
-    "date": "2026-08-06",
-    "engine": "Codex CLI",
+    "engine": "codex",
+    "mode": "all",
     "top_k": 5,
+    "recorded_at": "2026-08-06T00:00:00+00:00",
     "events": 90,
-    "questions": 30,
-    "timing_note": "One timed replay per condition; wall time is observational.",
-    "cost_note": "Estimated token proxy using ceil(characters / 4); billable USD was not exposed."
+    "questions": 30
   },
   "methods": [
     {
       "name": "Large context",
       "key": "large",
+      "shape": "circle",
       "questions": 30,
-      "automated_correct": 23,
-      "automated_accuracy": 0.7666666666666667,
-      "audited_correct": 27,
-      "audited_accuracy": 0.9,
-      "audited_partial": 2,
-      "audited_incorrect": 1,
+      "correct": 23,
+      "incomplete": 6,
+      "incorrect": 1,
       "prompt_chars": 34103,
       "input_token_proxy": 8526,
       "answer_chars": 2236,
       "output_token_proxy": 559,
       "total_token_proxy": 9085,
       "wall_seconds": 150.057,
-      "manual_error_counts": {
-        "Multi-owner history": 1,
-        "Missed blocker transition": 1,
-        "Canceled/obsolete scope": 1
-      }
+      "timing_source": "saved Week 6 live replay"
     },
     {
       "name": "Traditional TF-IDF RAG",
       "key": "rag",
+      "shape": "square",
       "questions": 30,
-      "automated_correct": 21,
-      "automated_accuracy": 0.7,
-      "audited_correct": 24,
-      "audited_accuracy": 0.8,
-      "audited_partial": 5,
-      "audited_incorrect": 1,
+      "correct": 21,
+      "incomplete": 8,
+      "incorrect": 1,
       "prompt_chars": 58503,
       "input_token_proxy": 14626,
       "answer_chars": 2440,
       "output_token_proxy": 610,
       "total_token_proxy": 15236,
       "wall_seconds": 108.809,
-      "manual_error_counts": {
-        "Missed QA rule detail": 1,
-        "Multi-owner history": 1,
-        "Missed blocker transition": 1,
-        "Missed recovery requirement detail": 1,
-        "Canceled/obsolete scope": 1,
-        "Irrelevant-information overinclusion": 1
-      }
+      "timing_source": "saved Week 6 live replay"
     },
     {
       "name": "Selective memory",
       "key": "selective",
+      "shape": "triangle",
       "questions": 30,
-      "automated_correct": 25,
-      "automated_accuracy": 0.8333333333333334,
-      "audited_correct": 29,
-      "audited_accuracy": 0.9666666666666667,
-      "audited_partial": 0,
-      "audited_incorrect": 1,
+      "correct": 25,
+      "incomplete": 3,
+      "incorrect": 2,
       "prompt_chars": 47380,
       "input_token_proxy": 11845,
       "answer_chars": 2556,
       "output_token_proxy": 639,
       "total_token_proxy": 12484,
       "wall_seconds": 217.326,
-      "manual_error_counts": {
-        "Event provenance": 1
-      }
+      "timing_source": "saved Week 6 live replay"
     }
   ],
   "rag_coverage": {
-    "any_supporting_event": 28,
+    "any": 28,
     "all": 23,
     "partial": 5,
     "none": 2
   },
-  "selective_wins": [
-    "Q16",
-    "Q17",
-    "Q25"
-  ],
-  "question_matrix": [
-    {
-      "id": "Q01",
-      "question": "Who currently owns the browser smoke tests?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q02",
-      "question": "Which project tasks are delayed at the end of Day 30?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q03",
-      "question": "What is the only active blocker at the end of Day 30?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q04",
-      "question": "What is the current MVP release target?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q05",
-      "question": "Which planned feature was removed because an existing mock mode already covered the need?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q06",
-      "question": "Is the Live Help offline fallback still part of the current MVP?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q07",
-      "question": "Which browser testing framework is the current technical decision?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q08",
-      "question": "Which cloud platform is the current primary terminal deployment target?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q09",
-      "question": "What is the current terminal draft recovery requirement?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q10",
-      "question": "Who owns guided learning paths and what is their current status?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q11",
-      "question": "What is the current status of the static HTML QA gate?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q12",
-      "question": "What rules define the current static HTML QA gate?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Partially correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q13",
-      "question": "Who owns local learner progress and is it complete?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q14",
-      "question": "Is root deployment routing still blocking the project?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q15",
-      "question": "Which README approach should be ignored as outdated?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q16",
-      "question": "Which tasks changed owners more than once by Day 30?",
-      "labels": {
-        "Large context": "Incorrect",
-        "Traditional TF-IDF RAG": "Incorrect",
-        "Selective memory": "Correct"
-      },
-      "winner": "Selective memory"
-    },
-    {
-      "id": "Q17",
-      "question": "Which blocker was active earlier, resolved, and followed by a later related active blocker?",
-      "labels": {
-        "Large context": "Partially correct",
-        "Traditional TF-IDF RAG": "Partially correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Selective memory"
-    },
-    {
-      "id": "Q18",
-      "question": "Which canceled feature was partly revived under a new name, and is it in the current MVP?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q19",
-      "question": "How should the two similarly named browser tasks be distinguished?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q20",
-      "question": "What are the successive deadline changes for legacy accessibility cleanup and its current target?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q21",
-      "question": "Which requirement was removed from the MVP but retained in the future backlog?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q22",
-      "question": "What old browser-owner fact must be ignored in the current answer?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q23",
-      "question": "Which events changed keyboard-only coverage from a release requirement into the current blocker?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Incorrect"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q24",
-      "question": "Which terminal draft-recovery facts should be used and which old fact should be ignored?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Partially correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q25",
-      "question": "Which canceled features should not be included in the current MVP?",
-      "labels": {
-        "Large context": "Partially correct",
-        "Traditional TF-IDF RAG": "Partially correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Selective memory"
-    },
-    {
-      "id": "Q26",
-      "question": "What current browser-testing decision replaces the earlier technical decision?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q27",
-      "question": "Which older release deadline would be wrong if the AI relied only on early notes?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q28",
-      "question": "What current facts define guided learning paths after the ownership and navigation changes?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q29",
-      "question": "Which temporary or expired project information should be ignored?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Partially correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    },
-    {
-      "id": "Q30",
-      "question": "What facts define current release risk at the end of Day 30?",
-      "labels": {
-        "Large context": "Correct",
-        "Traditional TF-IDF RAG": "Correct",
-        "Selective memory": "Correct"
-      },
-      "winner": "Tie"
-    }
-  ],
-  "sources": [
-    "results/week7_final_scoring.csv",
-    "results/week7_summary.md",
-    "results/week6_efficiency.md",
-    "data/evaluation_questions.csv"
+  "notes": [
+    "Accuracy is automated Correct answers divided by 30.",
+    "Cost is an estimated total token proxy using ceil(characters / 4), not USD.",
+    "Time is one observed end-to-end run per condition when available.",
+    "The graph has no composite score. Metric-specific tradeoffs remain visible."
   ]
 }

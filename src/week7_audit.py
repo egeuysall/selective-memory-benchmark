@@ -282,7 +282,7 @@ def main() -> None:
     ]
     for row in by_approach["Selective memory"]:
         if row["Manual Label"] != "Correct":
-            summary_lines.append(f"| `{row['Question ID']}` | {row['Manual Label']} | {row['Manual Error Type']} — {row['Review Reason']} |")
+            summary_lines.append(f"| `{row['Question ID']}` | {row['Manual Label']} | {row['Manual Error Type']}: {row['Review Reason']} |")
     summary_lines += [
         "",
         "The selective-memory miss is an event-provenance error: the answer",
@@ -320,7 +320,7 @@ def main() -> None:
         "python3 visual_benchmark/build_report.py --check",
         "```",
         "",
-        "The visual benchmark is [the Vercel-style report](../visual_benchmark/index.html).",
+        "The visual benchmark is [the Vercel-style SVG](../visual_benchmark/benchmark.svg).",
         "Its price comparison is an estimated token-cost proxy because the Codex",
         "replay did not expose billable USD or a model price schedule.",
         "",

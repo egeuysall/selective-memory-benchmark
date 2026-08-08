@@ -39,7 +39,7 @@ No private project data, credentials, or contact details are included.
 - [Week 6 efficiency comparison](results/week6_efficiency.md)
 - [Week 7 audited scoring and analysis](results/week7_summary.md)
 - [Week 7 final scoring CSV](results/week7_final_scoring.csv)
-- [Vercel-style visual benchmark](visual_benchmark/index.html)
+- [Vercel-style visual benchmark](visual_benchmark/benchmark.svg)
 - [Publication readiness and paper-writing guide](PUBLICATION_READINESS_AND_PAPER_GUIDE.md)
 
 ## Run locally
@@ -90,7 +90,7 @@ at least one current supporting event for 28/30 questions and the full
 supporting set for 23/30. Selective memory used 18.1% fewer estimated total
 tokens than RAG, but the one timed replay was slower end-to-end (217.326
 seconds versus 108.809 seconds). These are dataset-specific, stochastic
-results—not a claim of general superiority—and exact billable USD was not
+results, not a claim of general superiority, and exact billable USD was not
 exposed.
 
 ## Outputs
@@ -108,7 +108,7 @@ exposed.
 - `results/week6_large_raw.json`, `results/week6_rag_raw.json`, and `results/week6_selective_raw.json`
 - `results/week7_final_scoring.csv` and `results/week7_manual_review.csv`
 - `results/week7_summary.md`
-- `visual_benchmark/index.html` and `visual_benchmark/benchmark_snapshot.json`
+- `visual_benchmark/benchmark.svg` and `visual_benchmark/benchmark_snapshot.json`
 - `PUBLICATION_READINESS_AND_PAPER_GUIDE.md`
 
 The standalone visual report is rebuilt with:
@@ -119,7 +119,10 @@ python3 visual_benchmark/build_report.py
 python3 visual_benchmark/build_report.py --check
 ```
 
-It uses inline SVG and semantic HTML, follows the supplied
+`src/benchmark.py run --mode all` now writes the timing manifest and regenerates
+the SVG automatically after the three result files are saved.
+
+It uses one inline SVG with direct labels, follows the supplied
 [Vercel design guidance](https://vercel.com/design.md), and does not add a
 charting dependency or a composite score.
 
