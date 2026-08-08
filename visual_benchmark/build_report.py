@@ -149,8 +149,8 @@ def marker(method: dict, x: float, y: float) -> str:
 
 
 def render_svg(snapshot: dict) -> str:
-    width, height = 1200, 760
-    left, right, top, bottom = 116, 76, 146, 540
+    width, height = 1200, 800
+    left, right, top, bottom = 116, 76, 188, 540
     plot_w, plot_h = width - left - right, bottom - top
     methods = snapshot["methods"]
     max_cost = max(method["total_token_proxy"] for method in methods)
@@ -186,11 +186,10 @@ def render_svg(snapshot: dict) -> str:
   .hairline {{ stroke: #111; stroke-width: 1; }}
 </style>
 <rect width="{width}" height="{height}" fill="#fff" />
-<polygon points="52,56 66,80 38,80" fill="#111" />
-{text(84, 74, "RECALLBENCH", "eyebrow")}
-{text(84, 111, "Accuracy against estimated token cost", "title")}
-{text(84, 134, f"90 events / 30 questions / {snapshot['run']['engine']} / top-k {snapshot['run']['top_k']}", "subtitle")}
-<line class="hairline" x1="{left}" y1="{top - 20}" x2="{width - right}" y2="{top - 20}" />
+{text(84, 60, "RECALLBENCH", "eyebrow")}
+{text(84, 104, "Accuracy against estimated token cost", "title")}
+{text(84, 130, f"90 events / 30 questions / {snapshot['run']['engine']} / top-k {snapshot['run']['top_k']}", "subtitle")}
+<line class="hairline" x1="{left}" y1="{top - 36}" x2="{width - right}" y2="{top - 36}" />
 '''
     ]
 
@@ -207,8 +206,8 @@ def render_svg(snapshot: dict) -> str:
     parts += [
         f'<line class="axis" x1="{left}" y1="{top}" x2="{left}" y2="{bottom}" />',
         f'<line class="axis" x1="{left}" y1="{bottom}" x2="{left + plot_w}" y2="{bottom}" />',
-        text(left, top - 32, "Automated accuracy", "axis-title"),
-        text(left + plot_w / 2, bottom + 53, "Estimated total token-cost proxy, lower is cheaper", "axis-title", "middle"),
+        text(left, top - 12, "Automated accuracy", "axis-title"),
+        text(left + plot_w / 2, bottom + 50, "Estimated total token-cost proxy, lower is cheaper", "axis-title", "middle"),
     ]
 
     label_positions = {
@@ -232,7 +231,7 @@ def render_svg(snapshot: dict) -> str:
         parts.append(text(label_x, label_y + 39, time_text(method["wall_seconds"]), "detail mono", anchor))
 
     legend_x = left + plot_w - 410
-    legend_y = top - 37
+    legend_y = 130
     for index, method in enumerate(methods):
         x = legend_x + index * 142
         parts.append(marker(method, x, legend_y - 4))
@@ -246,12 +245,12 @@ def render_svg(snapshot: dict) -> str:
     time_delta = ((selective_time / rag_time) - 1) * 100 if selective_time is not None and rag_time else None
     time_note = f"{time_delta:.1f}% slower than RAG" if time_delta is not None else "time unavailable"
     parts += [
-        '<line class="hairline" x1="116" y1="596" x2="1124" y2="596" />',
-        text(116, 626, "Metric-specific readout", "eyebrow"),
-        text(116, 652, f"Selective memory: {pct(selective['correct'], selective['questions'])} accuracy / {abs(token_delta):.1f}% lower token proxy than RAG / {time_note}", "note mono"),
-        text(116, 676, "RAG is fastest. Exact USD is unavailable from this replay. No composite score is used.", "note"),
-        text(1124, 704, "Accuracy = automated Correct / 30. Cost = ceil(characters / 4). Time = one observed run.", "note mono", "end"),
-        text(1124, 728, "Source: current results/week6_* CSVs and benchmark_run_metrics.json", "note mono", "end"),
+        '<line class="hairline" x1="116" y1="620" x2="1124" y2="620" />',
+        text(116, 650, "Metric-specific readout", "eyebrow"),
+        text(116, 676, f"Selective memory: {pct(selective['correct'], selective['questions'])} accuracy / {abs(token_delta):.1f}% lower token proxy than RAG / {time_note}", "note mono"),
+        text(116, 700, "RAG is fastest. Exact USD is unavailable from this replay. No composite score is used.", "note"),
+        text(1124, 744, "Accuracy = automated Correct / 30. Cost = ceil(characters / 4). Time = one observed run.", "note mono", "end"),
+        text(1124, 768, "Source: current results/week6_* CSVs and benchmark_run_metrics.json", "note mono", "end"),
         '</svg>',
     ]
     svg = "".join(parts)
